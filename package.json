@@ -7,7 +7,8 @@
     "clean": "rm -rf dist",
     "format": "npx prettier -c --ignore-path .prettierignore --write \"**/*.+(ts|js|json)\"",
     "lint": "npx eslint . --fix",
-    "dev": "npx ts-node-dev --transpile-only --no-notify --exit-child -r tsconfig-paths/register src/index.ts -- PORT=4000 ENV=development"
+    "dev": "npx ts-node-dev --transpile-only --no-notify --exit-child -r tsconfig-paths/register src/index.ts -- PORT=4000 ENV=development",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
