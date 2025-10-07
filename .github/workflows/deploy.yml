@@ -15,6 +15,11 @@ jobs:
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
+      - name: Login to AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS }}
+
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
         with:
