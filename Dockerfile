@@ -7,7 +7,7 @@ WORKDIR /app
 # ---- deps (dev+prod for building) ----
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 # ---- build ----
 FROM deps AS build
@@ -24,7 +24,7 @@ WORKDIR /home/node/app
 
 # Install only prod deps
 COPY package.json package-lock.json ./
-RUN npm ci 
+RUN npm ci --omit=dev
 
 # Bring in compiled output only
 COPY --from=build /app/dist ./dist
