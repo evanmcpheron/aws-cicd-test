@@ -8,7 +8,8 @@
     "format": "npx prettier -c --ignore-path .prettierignore --write \"**/*.+(ts|js|json)\"",
     "lint": "npx eslint . --fix",
     "dev": "npx ts-node-dev --transpile-only --no-notify --exit-child -r tsconfig-paths/register src/index.ts -- PORT=4000 ENV=development",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "npx ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
+    "redis": "^5.8.3",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"
   },
