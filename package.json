@@ -9,7 +9,8 @@
     "lint": "npx eslint . --fix",
     "dev": "npx ts-node-dev --transpile-only --no-notify --exit-child -r tsconfig-paths/register src/index.ts -- PORT=4000 ENV=development",
     "build": "tsc",
-    "start": "npx ts-node src/index.ts"
+    "start": "npx ts-node src/index.ts",
+    "test": "echo \"ADD A TEST SCRIPT HERE\""
   },
   "repository": {
     "type": "git",
