@@ -1,6 +1,9 @@
 name: Deploy API
 on:
   push:
+    paths:
+      - 'src/**'
+      - 'db/**'
     branches:
       - main
 
