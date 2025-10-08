@@ -92,7 +92,7 @@ jobs:
           docker push $REGISTRY/$REPO:latest
 
       - name: Force new ECS deployment (reuse same TD)
-        if: ${{ success() && secrets.ECS_CLUSTER && secrets.ECS_SERVICE }}
+        if: ${{ success() }}
         run: |
           aws ecs update-service \
             --cluster "${{ secrets.ECS_CLUSTER }}" \
