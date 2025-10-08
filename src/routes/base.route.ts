@@ -2,9 +2,9 @@ import { Router } from 'express';
 
 const baseRouter = Router();
 
-// baseRouter.get('/healthz', (req, res) => {
-//   res.send('OK')
-// })
+baseRouter.get('/healthz', (req, res) => {
+  res.send('OK');
+});
 
 baseRouter.get('/ping', (req, res) => {
   res.send({ data: 'pong' });
