@@ -18,7 +18,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS }}
           
       - name: Generate deployment package
-        run: zip -r deploy.zip . -x '*.git*'
+        run: zip -r build.zip . -x '*.git*'
 
       - name: Upload ZIP to S3
         run: |
