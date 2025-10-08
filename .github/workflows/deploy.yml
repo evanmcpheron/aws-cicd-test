@@ -14,11 +14,8 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS }}
-          
-      - name: Generate deployment package
-        run: zip -r build.zip . -x '*.git*'
 
-      - name: Upload ZIP to S3
+      - name: Upload to ECR
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
           docker build -t turndown/api .

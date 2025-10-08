@@ -30,6 +30,7 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 
 EXPOSE 4000
+
 ENV NODE_OPTIONS=--enable-source-maps
 
 CMD ["node", "dist/src/index.js"]
