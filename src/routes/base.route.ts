@@ -7,7 +7,7 @@ baseRouter.get('/healthz', (req, res) => {
 });
 
 baseRouter.get('/ping', (req, res) => {
-  res.send({ data: 'pong' });
+  res.send({ data: 'pong with an update' });
 });
 
 baseRouter.post('/hello', (req, res) => {
