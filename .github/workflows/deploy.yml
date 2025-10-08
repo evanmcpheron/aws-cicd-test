@@ -32,7 +32,7 @@ jobs:
             production
 
       - name: Update Version
-        run: npm run update-version:production
+        run: npm run update:version:production
 
       - name: Read version from package.json
         id: ver
