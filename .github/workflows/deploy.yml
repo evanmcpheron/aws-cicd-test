@@ -12,17 +12,16 @@ jobs:
       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - run: docker build -t emcpheron/aws-test .
 
+      - name: Login to AWS
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS }}
+          
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v18
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          application_name: test
-          environment_name: Test-env
-          existing_bucket_name: elasticbeanstalk-us-east-1-707282035250
-          region: us-east-1
-          version_label: ${{ github.sha }}
-          deployment_package: deploy.zip
+      - name: Upload ZIP to S3
+        run: |
+          aws s3 cp build.zip s3://turndown-cicd-test-bucket/builds/build.zip
+          echo "S3_BUCKET=turndown-cicd-test-bucket" >> $GITHUB_ENV
+          echo "S3_KEY=builds/build.zip" >> $GITHUB_ENV
