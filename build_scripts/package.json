@@ -1,0 +1,6 @@
+{
+  "name": "build-turndown-scripts",
+  "version": "1.0.0",
+  "description": "build scripts for turndown",
+  "type": "commonjs"
+}

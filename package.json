@@ -1,6 +1,6 @@
 {
   "name": "aws-cicd-test",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "dev": "npx ts-node-dev --transpile-only --no-notify --exit-child -r tsconfig-paths/register src/index.ts -- PORT=4000 ENV=development",
     "build": "tsc",
     "start": "npx ts-node src/index.ts",
-    "test": "echo \"ADD A TEST SCRIPT HERE\""
+    "test": "echo \"ADD A TEST SCRIPT HERE\"",
+    "update:version:production": "node build_scripts/update.version.js version.production.json production"
   },
   "repository": {
     "type": "git",

@@ -7,6 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
 
@@ -14,10 +20,77 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS }}
+          aws configure set default.region us-east-1
 
-      - name: Upload to ECR
+      - name: Update deployed date
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
-          docker build -t turndown/api .
-          docker tag turndown/api:latest ${{ secrets.AWS_ECR_URL }}/turndown/api:latest
-          docker push ${{ secrets.AWS_ECR_URL }}/turndown/api:latest
+          node build_scripts/update.deployed.js \
+            production
+
+      - name: Update Version
+        run: npm run update-version:production
+
+      - name: Read version from package.json
+        id: ver
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configure git author
+        run: |
+          git config user.name "Turndown Admin"
+          git config user.email "evan.mcpheron@icloud.com"   # fixed: no .com.com
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Commit changes (if any)
+        id: commit
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "no_changes=true" >> "$GITHUB_OUTPUT"
+            echo "No changes to commit."
+            exit 0
+          fi
+          git add -A
+          git commit -m "Automated Version Bump" --no-verify || true
+
+      - name: Push
+        if: steps.commit.outputs.no_changes != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # actions/checkout already set up the remote with the token
+          # ensure we push back to the same branch
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          git push origin "HEAD:${BRANCH}"
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 \
+          | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
+
+      - name: Build & tag image with version (and latest)
+        env:
+          REGISTRY: ${{ secrets.AWS_ECR_URL }}
+          REPO: turndown/api
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          docker build -t $REGISTRY/$REPO:$VERSION .
+          docker tag $REGISTRY/$REPO:$VERSION $REGISTRY/$REPO:latest
+
+      - name: Push image(s)
+        env:
+          REGISTRY: ${{ secrets.AWS_ECR_URL }}
+          REPO: turndown/api
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          docker push $REGISTRY/$REPO:$VERSION
+          docker push $REGISTRY/$REPO:latest
+
+      - name: Force new ECS deployment (reuse same TD)
+        if: ${{ success() && secrets.ECS_CLUSTER && secrets.ECS_SERVICE }}
+        run: |
+          aws ecs update-service \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --service "${{ secrets.ECS_SERVICE }}" \
+            --force-new-deployment
